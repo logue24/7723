@@ -1,0 +1,19 @@
+name = "qrelay-api"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+# Tạo bằng: npx wrangler kv namespace create CODES
+# rồi dán "id" mà lệnh trên trả về vào đây.
+[[kv_namespaces]]
+binding = "CODES"
+id = "PASTE_KV_NAMESPACE_ID_HERE"
+
+[vars]
+# Account ID: xem ở Cloudflare Dashboard > Workers & Pages (góc phải trang tổng quan)
+R2_ACCOUNT_ID = "PASTE_CLOUDFLARE_ACCOUNT_ID_HERE"
+R2_BUCKET_NAME = "qrelay-files"
+
+# R2_ACCESS_KEY_ID và R2_SECRET_ACCESS_KEY KHÔNG khai báo ở đây (đây là secret).
+# Set bằng lệnh:
+#   npx wrangler secret put R2_ACCESS_KEY_ID
+#   npx wrangler secret put R2_SECRET_ACCESS_KEY

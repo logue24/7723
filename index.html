@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>QRelay — Chuyển dữ liệu qua mã QR</title>
+<meta name="description" content="Gửi và nhận tệp hoặc văn bản tức thời qua mã QR hoặc mã số. Không giới hạn tài khoản, tối đa 1.2GB mỗi tệp.">
+<meta name="theme-color" content="#0B0D10">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0D10'/%3E%3Cpath d='M14 14h14v14H14zM36 14h14v14H36zM14 36h14v14H14z' fill='none' stroke='%23E8362C' stroke-width='4'/%3E%3Crect x='38' y='38' width='10' height='10' fill='%23E8362C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<svg class="icon-defs" aria-hidden="true">
+<defs>
+<symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 16V4M12 4L7 9M12 4l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-send" viewBox="0 0 24 24"><path d="M3 11.5 20.5 4 13 21.5l-2.6-7.2L3 11.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+<symbol id="icon-receive" viewBox="0 0 24 24"><path d="M12 4v13M12 17l-5-5M12 17l5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="icon-camera" viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 8V5.6A1.6 1.6 0 0 0 14.4 4H5.6A1.6 1.6 0 0 0 4 5.6v8.8A1.6 1.6 0 0 0 5.6 16H8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="icon-file" viewBox="0 0 24 24"><path d="M6 3h8l5 5v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3v5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="icon-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="9.5" r="1.7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m4 17 5-5 3.5 3.5L17 11l3.5 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+<symbol id="icon-video" viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 10.5 21 7v10l-5-3.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="icon-audio" viewBox="0 0 24 24"><path d="M4 14v-3M8 17v-9M12 19v-13M16 16v-7M20 12.5v-1" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+<symbol id="icon-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 9v9a1.6 1.6 0 0 0 1.6 1.6h10.8A1.6 1.6 0 0 0 19 18V9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.3 12.5h3.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="icon-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.7 12h16.6M12 3.7c2.5 2.3 3.8 5.2 3.8 8.3s-1.3 6-3.8 8.3c-2.5-2.3-3.8-5.2-3.8-8.3s1.3-6 3.8-8.3Z" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+<symbol id="icon-x" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+<symbol id="icon-torch" viewBox="0 0 24 24"><path d="M9 2h6l-1 6h2.5L10 22l1.2-8.5H8L9 2Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+<symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.4V12l3.4 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-alert" viewBox="0 0 24 24"><path d="M12 3.5 21.5 20h-19L12 3.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 10v4.2M12 17.3v.1" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+<symbol id="icon-checklist" viewBox="0 0 24 24"><path d="M4 6.5h2.2M4 12h2.2M4 17.5h2.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="m4 6.5 1 1 1.6-1.9" stroke="currentColor" stroke-width="0" fill="none"/><path d="M10 6.5h10M10 12h10M10 17.5h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="icon-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="3" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="14" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="14.5" y="14.5" width="2.6" height="2.6" fill="currentColor"/><rect x="18.5" y="14.5" width="2.6" height="2.6" fill="currentColor"/><rect x="14.5" y="18.5" width="2.6" height="2.6" fill="currentColor"/><rect x="18.5" y="18.5" width="2.6" height="2.6" fill="currentColor"/></symbol>
+<symbol id="icon-link" viewBox="0 0 24 24"><path d="M9.5 14.5 14.5 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M11 6.5 12.3 5.2a3.6 3.6 0 0 1 5.1 5.1L16 11.6M13 17.5l-1.3 1.3a3.6 3.6 0 0 1-5.1-5.1L8 12.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+</defs>
+</svg>
+
+<div class="app">
+
+  <header class="board-header">
+    <div class="wordmark"><span class="live-dot" aria-hidden="true"></span>QRELAY</div>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" class="lang-chip" data-lang="vi">VI</button>
+      <button type="button" class="lang-chip" data-lang="en">EN</button>
+      <button type="button" class="lang-chip" data-lang="ko">KO</button>
+      <button type="button" class="lang-chip" data-lang="ja">JA</button>
+      <button type="button" class="lang-chip" data-lang="zh">ZH</button>
+    </div>
+  </header>
+
+  <nav class="mode-tabs" role="tablist">
+    <button type="button" id="tab-send" class="mode-tab" data-mode="send" role="tab" aria-selected="true">
+      <svg class="ic"><use href="#icon-send"/></svg>
+      <span data-i18n="nav.send"></span>
+    </button>
+    <button type="button" id="tab-receive" class="mode-tab" data-mode="receive" role="tab" aria-selected="false">
+      <svg class="ic"><use href="#icon-receive"/></svg>
+      <span data-i18n="nav.receive"></span>
+    </button>
+  </nav>
+
+  <main>
+    <!-- ===================== SEND PANEL ===================== -->
+    <section id="panel-send" class="panel" role="tabpanel">
+
+      <div class="subtabs">
+        <button type="button" id="subtab-file" class="subtab" data-sub="file">
+          <svg class="ic-sm"><use href="#icon-file"/></svg>
+          <span data-i18n="send.tabFile"></span>
+        </button>
+        <button type="button" id="subtab-text" class="subtab" data-sub="text">
+          <svg class="ic-sm"><use href="#icon-checklist"/></svg>
+          <span data-i18n="send.tabText"></span>
+        </button>
+      </div>
+
+      <div id="send-file-view" class="stage">
+        <label for="file-input" id="dropzone" class="dropzone">
+          <input type="file" id="file-input" multiple hidden>
+          <svg class="ic-lg"><use href="#icon-upload"/></svg>
+          <p class="dz-title" data-i18n="send.dropTitle"></p>
+          <p class="dz-sub" data-i18n="send.dropSub"></p>
+        </label>
+        <ul id="file-list" class="file-list" hidden></ul>
+        <p id="file-total" class="hint-line" hidden></p>
+      </div>
+
+      <div id="send-text-view" class="stage" hidden>
+        <textarea id="text-input" class="text-input" rows="8" data-i18n-ph="send.textPlaceholder"></textarea>
+        <div class="stats-row">
+          <span><span id="line-count">0</span> <span data-i18n="send.lines"></span></span>
+          <span><span id="char-count">0</span> <span data-i18n="send.chars"></span></span>
+        </div>
+      </div>
+
+      <button type="button" id="btn-generate" class="primary-btn" disabled>
+        <svg class="ic-sm"><use href="#icon-qr"/></svg>
+        <span data-i18n="send.generate"></span>
+      </button>
+
+      <div id="send-progress" class="progress-block" hidden>
+        <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+        <p id="progress-label" class="hint-line"></p>
+      </div>
+
+      <p id="send-error" class="error-line" hidden></p>
+
+      <div id="send-result" class="ticket-wrap" hidden>
+        <div class="ticket">
+          <div class="ticket-left">
+            <p class="ticket-label" data-i18n="send.codeLabel"></p>
+            <p id="result-code" class="ticket-code">000000</p>
+            <p class="ticket-expiry">
+              <svg class="ic-xs"><use href="#icon-clock"/></svg>
+              <span data-i18n="send.expiresIn"></span> <span id="result-expiry">24:00:00</span>
+            </p>
+          </div>
+          <div class="ticket-perforation" aria-hidden="true"></div>
+          <div class="ticket-right">
+            <canvas id="qr-canvas" width="150" height="150"></canvas>
+          </div>
+        </div>
+        <div class="ticket-actions">
+          <button type="button" id="btn-copy-code" class="ghost-btn">
+            <svg class="ic-sm"><use href="#icon-copy"/></svg>
+            <span data-i18n="send.copyCode"></span>
+          </button>
+          <button type="button" id="btn-copy-link" class="ghost-btn">
+            <svg class="ic-sm"><use href="#icon-link"/></svg>
+            <span data-i18n="send.copyLink"></span>
+          </button>
+        </div>
+        <button type="button" id="btn-new-send" class="text-btn" data-i18n="send.newCode"></button>
+      </div>
+
+    </section>
+
+    <!-- ===================== RECEIVE PANEL ===================== -->
+    <section id="panel-receive" class="panel" role="tabpanel" hidden>
+
+      <div class="scan-block">
+        <div id="viewfinder" class="viewfinder">
+          <video id="qr-video" playsinline muted></video>
+          <div class="frame-corner tl"></div>
+          <div class="frame-corner tr"></div>
+          <div class="frame-corner bl"></div>
+          <div class="frame-corner br"></div>
+          <div id="scan-line" class="scan-line" hidden></div>
+          <p id="cam-hint" class="cam-hint" data-i18n="receive.camHint"></p>
+        </div>
+        <div class="cam-controls">
+          <button type="button" id="btn-camera-toggle" class="ghost-btn">
+            <svg class="ic-sm"><use href="#icon-camera"/></svg>
+            <span data-i18n="receive.camStart"></span>
+          </button>
+          <button type="button" id="btn-torch" class="icon-btn" hidden aria-label="Torch">
+            <svg class="ic-sm"><use href="#icon-torch"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="divider-label"><span data-i18n="receive.orManual"></span></div>
+
+      <div class="manual-entry">
+        <div id="code-boxes" class="code-boxes">
+          <input class="code-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="digit 1">
+          <input class="code-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="digit 2">
+          <input class="code-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="digit 3">
+          <input class="code-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="digit 4">
+          <input class="code-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="digit 5">
+          <input class="code-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="digit 6">
+        </div>
+        <button type="button" id="btn-confirm-code" class="primary-btn">
+          <svg class="ic-sm"><use href="#icon-check"/></svg>
+          <span data-i18n="receive.confirm"></span>
+        </button>
+      </div>
+
+      <p id="receive-error" class="error-line" hidden></p>
+      <p id="receive-loading" class="hint-line" hidden data-i18n="receive.looking"></p>
+
+      <div id="receive-result" class="stage" hidden>
+
+        <div id="receive-text-view" hidden>
+          <pre id="receive-text-content" class="text-preview"></pre>
+          <div class="stats-row">
+            <span><span id="receive-line-count">0</span> <span data-i18n="send.lines"></span></span>
+            <span><span id="receive-char-count">0</span> <span data-i18n="send.chars"></span></span>
+          </div>
+          <button type="button" id="btn-copy-received-text" class="ghost-btn">
+            <svg class="ic-sm"><use href="#icon-copy"/></svg>
+            <span data-i18n="send.copyCode"></span>
+          </button>
+        </div>
+
+        <div id="receive-file-view" hidden>
+          <div class="manifest-header">
+            <label class="check-row">
+              <input type="checkbox" id="select-all">
+              <span data-i18n="receive.selectAll"></span>
+            </label>
+            <span id="file-summary" class="hint-line"></span>
+          </div>
+          <ul id="file-manifest" class="file-manifest"></ul>
+          <button type="button" id="btn-download-selected" class="primary-btn">
+            <svg class="ic-sm"><use href="#icon-receive"/></svg>
+            <span data-i18n="receive.downloadSelected"></span>
+          </button>
+        </div>
+
+        <button type="button" id="btn-new-receive" class="text-btn" data-i18n="receive.scanAnother"></button>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="board-footer">
+    <span data-i18n="footer.tagline"></span>
+  </footer>
+</div>
+
+<template id="tpl-manifest-row">
+  <li class="manifest-row">
+    <label class="check-row">
+      <input type="checkbox" class="row-check">
+    </label>
+    <svg class="ic row-icon"><use href="#icon-file"/></svg>
+    <div class="row-info">
+      <p class="row-name"></p>
+      <p class="row-size"></p>
+      <div class="row-preview"></div>
+    </div>
+    <a class="row-download icon-btn" download target="_blank" rel="noopener" aria-label="download">
+      <svg class="ic-sm"><use href="#icon-receive"/></svg>
+    </a>
+  </li>
+</template>
+
+<template id="tpl-send-file-row">
+  <li class="send-file-row">
+    <svg class="ic row-icon"><use href="#icon-file"/></svg>
+    <div class="row-info">
+      <p class="row-name"></p>
+      <p class="row-size"></p>
+    </div>
+    <button type="button" class="row-remove icon-btn" aria-label="remove">
+      <svg class="ic-sm"><use href="#icon-x"/></svg>
+    </button>
+  </li>
+</template>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1/dist/jsQR.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
