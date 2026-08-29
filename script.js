@@ -8,6 +8,14 @@ const API_BASE = "https://REPLACE-WITH-YOUR-WORKER.workers.dev";
 const MAX_FILE_SIZE = 1288490188; // 1.2 GiB — phải khớp với worker
 const MAX_FILES = 50;
 
+function isApiConfigured() {
+  return !/REPLACE-WITH-YOUR-WORKER/.test(API_BASE);
+}
+
+function networkErrorKey() {
+  return isApiConfigured() ? "errors.network" : "errors.notConfigured";
+}
+
 /* ============================================================
    I18N
    ============================================================ */
@@ -37,6 +45,7 @@ const I18N = {
     "errors.emptyText": "Vui lòng nhập văn bản",
     "errors.codeNotFound": "Không tìm thấy mã này hoặc đã hết hạn",
     "errors.network": "Lỗi kết nối, vui lòng thử lại",
+    "errors.notConfigured": "Chưa gắn địa chỉ Worker vào script.js — xem HUONG-DAN-TRIEN-KHAI.md (Phần A)",
     "errors.cameraDenied": "Không có quyền truy cập camera",
     "errors.cameraUnavailable": "Thiết bị không hỗ trợ camera",
     "errors.invalidCode": "Vui lòng nhập đủ 6 số",
@@ -70,6 +79,7 @@ const I18N = {
     "errors.emptyText": "Please enter some text",
     "errors.codeNotFound": "Code not found or expired",
     "errors.network": "Connection error, please try again",
+    "errors.notConfigured": "The Worker address isn't set in script.js yet — see HUONG-DAN-TRIEN-KHAI.md (Part A)",
     "errors.cameraDenied": "Camera access was denied",
     "errors.cameraUnavailable": "This device has no camera",
     "errors.invalidCode": "Please enter all 6 digits",
@@ -103,6 +113,7 @@ const I18N = {
     "errors.emptyText": "텍스트를 입력해 주세요",
     "errors.codeNotFound": "코드를 찾을 수 없거나 만료되었습니다",
     "errors.network": "연결 오류, 다시 시도해 주세요",
+    "errors.notConfigured": "script.js에 Worker 주소가 아직 설정되지 않았습니다 — HUONG-DAN-TRIEN-KHAI.md(A부분) 참고",
     "errors.cameraDenied": "카메라 접근 권한이 없습니다",
     "errors.cameraUnavailable": "이 기기에는 카메라가 없습니다",
     "errors.invalidCode": "6자리를 모두 입력해 주세요",
@@ -136,6 +147,7 @@ const I18N = {
     "errors.emptyText": "テキストを入力してください",
     "errors.codeNotFound": "コードが見つからないか、期限切れです",
     "errors.network": "接続エラーです。もう一度お試しください",
+    "errors.notConfigured": "script.js に Worker のアドレスが未設定です — HUONG-DAN-TRIEN-KHAI.md（パートA）参照",
     "errors.cameraDenied": "カメラへのアクセスが許可されていません",
     "errors.cameraUnavailable": "この端末にはカメラがありません",
     "errors.invalidCode": "6桁すべて入力してください",
@@ -169,6 +181,7 @@ const I18N = {
     "errors.emptyText": "请输入文本",
     "errors.codeNotFound": "找不到该代码或已过期",
     "errors.network": "连接错误，请重试",
+    "errors.notConfigured": "script.js 中尚未设置 Worker 地址 — 请参阅 HUONG-DAN-TRIEN-KHAI.md（A部分）",
     "errors.cameraDenied": "摄像头访问权限被拒绝",
     "errors.cameraUnavailable": "此设备没有摄像头",
     "errors.invalidCode": "请输入完整的6位数字",
@@ -471,7 +484,7 @@ async function doSendFiles() {
   } catch (err) {
     sendProgress.hidden = true;
     btnGenerate.disabled = false;
-    showSendError(t("errors.network"));
+    showSendError(t(networkErrorKey()));
   }
 }
 
@@ -497,7 +510,7 @@ async function doSendText() {
   } catch (err) {
     sendProgress.hidden = true;
     btnGenerate.disabled = false;
-    showSendError(t("errors.network"));
+    showSendError(t(networkErrorKey()));
   }
 }
 
@@ -699,7 +712,7 @@ async function lookupCode(code) {
     renderReceiveResult(data);
   } catch (err) {
     receiveLoadingEl.hidden = true;
-    showReceiveError(t("errors.network"));
+    showReceiveError(t(networkErrorKey()));
   }
 }
 
@@ -812,6 +825,9 @@ document.querySelectorAll(".lang-chip").forEach((chip) => {
 
 function init() {
   applyLanguage(detectInitialLang());
+  if (!isApiConfigured()) {
+    document.getElementById("config-warning").hidden = false;
+  }
   switchMode("send");
   switchSubtab("file");
   renderFileList();
