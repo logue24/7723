@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chia sẻ liên kết & QR</title>
+
+<!-- Icon -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: transparent;
+    font-family: Arial, sans-serif;
+    color: #fff;
+}
+
+.container {
+    width: 100%;
+    max-width: 390px;
+    text-align: center;
+    padding: 24px 18px;
+    background: transparent;
+}
+
+.logo {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: linear-gradient(135deg,#4776ff,#9b5cff);
+    font-size: 29px;
+    box-shadow: 0 5px 25px #4776ff55;
+}
+
+h2 {
+    font-size: 23px;
+    margin-bottom: 8px;
+}
+
+.description {
+    font-size: 13px;
+    opacity: .75;
+    margin-bottom: 22px;
+}
+
+.qr-box {
+    display: inline-flex;
+    padding: 13px;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 5px 25px #0002;
+    margin-bottom: 18px;
+}
+
+#qrcode {
+    width: 190px;
+    height: 190px;
+}
+
+.link-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid #ffffff55;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    background: #ffffff12;
+}
+
+.link-box input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: inherit;
+    font-size: 12px;
+}
+
+.link-box button {
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.btn {
+    padding: 13px 8px;
+    border: none;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.btn:active {
+    transform: scale(.96);
+}
+
+.primary {
+    background: linear-gradient(135deg,#4776ff,#815cff);
+    color: white;
+}
+
+.secondary {
+    background: #ffffff20;
+    color: inherit;
+    border: 1px solid #ffffff55;
+}
+
+.btn i {
+    margin-right: 6px;
+}
+
+.footer {
+    font-size: 11px;
+    opacity: .55;
+    margin-top: 18px;
+}
+
+@media(max-width:350px) {
+    #qrcode {
+        width: 165px;
+        height: 165px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">
+        <i class="fa-solid fa-qrcode"></i>
+    </div>
+
+    <h2>Chia sẻ trang web</h2>
+
+    <p class="description">
+        Quét mã QR hoặc chia sẻ liên kết nhanh chóng
+    </p>
+
+    <div class="qr-box">
+        <div id="qrcode"></div>
+    </div>
+
+    <div class="link-box">
+        <input id="websiteLink" type="text" readonly>
+        <button onclick="copyLink()" title="Sao chép liên kết">
+            <i class="fa-regular fa-copy"></i>
+        </button>
+    </div>
+
+    <div class="buttons">
+
+        <button class="btn primary" onclick="shareLink()">
+            <i class="fa-solid fa-share-nodes"></i>
+            Chia sẻ
+        </button>
+
+        <button class="btn secondary" onclick="copyLink()">
+            <i class="fa-solid fa-link"></i>
+            Sao chép link
+        </button>
+
+        <button class="btn secondary" onclick="downloadQR()">
+            <i class="fa-solid fa-download"></i>
+            Tải mã QR
+        </button>
+
+        <button class="btn secondary" onclick="openWebsite()">
+            <i class="fa-solid fa-globe"></i>
+            Mở trang web
+        </button>
+
+    </div>
+
+    <div class="footer">
+        © 2026 • Smart QR Sharing
+    </div>
+
+</div>
+
+<!-- Thư viện tạo QR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+const websiteURL =
+"https://sites.google.com/view/id-card-smart/trang-ch%E1%BB%A7";
+
+document.getElementById("websiteLink").value = websiteURL;
+
+// Tạo mã QR
+const qr = new QRCode(
+    document.getElementById("qrcode"),
+    {
+        text: websiteURL,
+        width: 190,
+        height: 190,
+        colorDark: "#111111",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    }
+);
+
+// Sao chép liên kết
+async function copyLink() {
+    try {
+        await navigator.clipboard.writeText(websiteURL);
+        alert("Đã sao chép liên kết thành công!");
+    } catch (e) {
+        const input = document.getElementById("websiteLink");
+        input.select();
+        document.execCommand("copy");
+        alert("Đã sao chép liên kết!");
+    }
+}
+
+// Chia sẻ
+async function shareLink() {
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: "Chia sẻ trang web",
+                text: "Truy cập trang web tại đây:",
+                url: websiteURL
+            });
+        } catch (e) {}
+    } else {
+        copyLink();
+    }
+}
+
+// Tải QR
+function downloadQR() {
+    const canvas = document.querySelector("#qrcode canvas");
+    const img = document.querySelector("#qrcode img");
+
+    let dataURL = canvas
+        ? canvas.toDataURL("image/png")
+        : img ? img.src : null;
+
+    if (!dataURL) {
+        alert("Mã QR chưa sẵn sàng!");
+        return;
+    }
+
+    const a = document.createElement("a");
+    a.href = dataURL;
+    a.download = "Smart-QR.png";
+    a.click();
+}
+
+// Mở website
+function openWebsite() {
+    window.open(websiteURL, "_blank");
+}
+</script>
+
+</body>
+</html>
