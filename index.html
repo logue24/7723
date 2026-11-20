@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PopCat Click 🐱</title>
@@ -28,7 +27,6 @@
       padding: 16px;
       padding-bottom: 40px;
     }
-    
     #authScreen {
       display: flex;
       flex-direction: column;
@@ -65,7 +63,6 @@
       font-weight: 700;
       font-size: 1rem;
       cursor: pointer;
-      transition: 0.2s;
     }
     .tab.active {
       background: var(--primary);
@@ -87,7 +84,6 @@
       font-size: 1rem;
       font-family: inherit;
       outline: none;
-      transition: 0.2s;
       background: #fafafa;
     }
     input:focus { border-color: var(--primary); background: white; }
@@ -103,7 +99,6 @@
       cursor: pointer;
       margin-top: 8px;
       box-shadow: 0 6px 20px rgba(255, 107, 157, 0.35);
-      transition: transform 0.15s;
     }
     .btn:active { transform: scale(0.97); }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -155,11 +150,7 @@
       align-items: center;
       justify-content: center;
     }
-    
-    .score-box {
-      text-align: center;
-      margin: 16px 0 8px;
-    }
+    .score-box { text-align: center; margin: 16px 0 8px; }
     .score-label { font-size: 0.9rem; color: #888; font-weight: 700; }
     .score-num {
       font-size: 3.2rem;
@@ -287,12 +278,7 @@
     .lb-info { flex: 1; min-width: 0; }
     .lb-name { font-weight: 800; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .lb-score { font-weight: 800; color: var(--primary); font-size: 1.1rem; }
-    
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #aaa;
-    }
+    .loading { text-align: center; padding: 40px; color: #aaa; }
   </style>
 </head>
 <body>
@@ -338,7 +324,7 @@
     <div id="gameScreen">
       <div class="header">
         <div class="user-info" id="userName">Player</div>
-        <button class="btn-icon" onclick="openLeaderboard()" title="Bảng xếp hạng">🏆</button>
+        <button class="btn-icon" onclick="openLeaderboard()">🏆</button>
       </div>
       
       <div class="score-box">
@@ -372,6 +358,9 @@
   </div>
 
   <script>
+    // Link Web App của bạn đã được điền sẵn
+    const API_URL = "https://script.google.com/macros/s/AKfycbyOm_i_OU_92bN_ngA5qiMLDfcYze2IXKSL5Ym-8bg_YFTRFoC9_FemKP3r3AoRl26Ipw/exec";
+
     const CAT_CLOSED = "https://i.ibb.co/G30n9pGn/file-000000007f18820799f0687d7eb7f351.png";
     const CAT_OPEN   = "https://i.ibb.co/1fCPQqzR/file-00000000e13482118b52f6fbecc2404d.png";
     
@@ -382,10 +371,24 @@
     let isSyncing = false;
     let catTimeout = null;
 
-    const imgClosed = new Image();
-    const imgOpen = new Image();
-    imgClosed.src = CAT_CLOSED;
-    imgOpen.src = CAT_OPEN;
+    new Image().src = CAT_CLOSED;
+    new Image().src = CAT_OPEN;
+
+    async function callAPI(action, params = {}) {
+      const url = new URL(API_URL);
+      url.searchParams.set('action', action);
+      for (const key in params) {
+        url.searchParams.set(key, params[key]);
+      }
+      
+      try {
+        const res = await fetch(url.toString());
+        return await res.json();
+      } catch (err) {
+        console.error(err);
+        return { success: false, message: 'Lỗi kết nối' };
+      }
+    }
 
     window.onload = function() {
       const saved = localStorage.getItem('popcat_user');
@@ -414,7 +417,7 @@
       el.style.display = 'block';
     }
     
-    function doRegister() {
+    async function doRegister() {
       const username = document.getElementById('regUsername').value.trim();
       const nickname = document.getElementById('regNickname').value.trim();
       
@@ -423,30 +426,23 @@
       document.getElementById('btnRegister').disabled = true;
       document.getElementById('btnRegister').textContent = 'Đang tạo...';
       
-      google.script.run
-        .withSuccessHandler(res => {
-          document.getElementById('btnRegister').disabled = false;
-          document.getElementById('btnRegister').textContent = 'Tạo tài khoản 🚀';
-          
-          if (res.success) {
-            currentUser = res.user;
-            localStorage.setItem('popcat_user', JSON.stringify(currentUser));
-            loadGame();
-          } else {
-            showError(res.message);
-            if (res.suggest) {
-              document.getElementById('suggestName').textContent = res.suggest;
-              document.getElementById('suggestBox').style.display = 'block';
-              window._suggest = res.suggest;
-            }
-          }
-        })
-        .withFailureHandler(() => {
-          document.getElementById('btnRegister').disabled = false;
-          document.getElementById('btnRegister').textContent = 'Tạo tài khoản 🚀';
-          showError('Lỗi kết nối. Thử lại.');
-        })
-        .register(username, nickname);
+      const res = await callAPI('register', { username, nickname });
+      
+      document.getElementById('btnRegister').disabled = false;
+      document.getElementById('btnRegister').textContent = 'Tạo tài khoản 🚀';
+      
+      if (res.success) {
+        currentUser = res.user;
+        localStorage.setItem('popcat_user', JSON.stringify(currentUser));
+        loadGame();
+      } else {
+        showError(res.message);
+        if (res.suggest) {
+          document.getElementById('suggestName').textContent = res.suggest;
+          document.getElementById('suggestBox').style.display = 'block';
+          window._suggest = res.suggest;
+        }
+      }
     }
     
     function useSuggest() {
@@ -456,47 +452,39 @@
       }
     }
     
-    function doLogin() {
+    async function doLogin() {
       const username = document.getElementById('loginUsername').value.trim();
       if (!username) return showError('Nhập tên người dùng');
       
       document.getElementById('btnLogin').disabled = true;
       document.getElementById('btnLogin').textContent = 'Đang vào...';
       
-      google.script.run
-        .withSuccessHandler(res => {
-          document.getElementById('btnLogin').disabled = false;
-          document.getElementById('btnLogin').textContent = 'Đăng nhập ✨';
-          
-          if (res.success) {
-            currentUser = res.user;
-            localStorage.setItem('popcat_user', JSON.stringify(currentUser));
-            loadGame();
-          } else {
-            showError(res.message);
-          }
-        })
-        .withFailureHandler(() => {
-          document.getElementById('btnLogin').disabled = false;
-          document.getElementById('btnLogin').textContent = 'Đăng nhập ✨';
-          showError('Lỗi kết nối');
-        })
-        .login(username);
+      const res = await callAPI('login', { username });
+      
+      document.getElementById('btnLogin').disabled = false;
+      document.getElementById('btnLogin').textContent = 'Đăng nhập ✨';
+      
+      if (res.success) {
+        currentUser = res.user;
+        localStorage.setItem('popcat_user', JSON.stringify(currentUser));
+        loadGame();
+      } else {
+        showError(res.message);
+      }
     }
     
-    function loadGame() {
+    async function loadGame() {
       document.getElementById('authScreen').style.display = 'none';
       document.getElementById('gameScreen').style.display = 'block';
       
       document.getElementById('userName').textContent = currentUser.nickname || currentUser.username;
       document.getElementById('catImg').src = CAT_CLOSED;
       
-      google.script.run
-        .withSuccessHandler(s => {
-          score = s || 0;
-          document.getElementById('scoreDisplay').textContent = score.toLocaleString();
-        })
-        .getMyScore(currentUser.username);
+      const res = await callAPI('getmyscore', { username: currentUser.username });
+      if (res.success) {
+        score = res.score || 0;
+        document.getElementById('scoreDisplay').textContent = score.toLocaleString();
+      }
       
       const area = document.getElementById('catArea');
       area.replaceWith(area.cloneNode(true));
@@ -509,8 +497,8 @@
       }, {passive: false});
       
       setInterval(updateCPS, 200);
-      setInterval(syncScore, 2500);
-      setInterval(refreshLeaderboardSilent, 12000);
+      setInterval(syncScore, 3000);
+      setInterval(refreshLeaderboardSilent, 15000);
       
       window.addEventListener('beforeunload', () => {
         if (currentUser) syncScore(true);
@@ -524,11 +512,8 @@
       document.getElementById('scoreDisplay').textContent = score.toLocaleString();
       
       const img = document.getElementById('catImg');
-      
       if (catTimeout) clearTimeout(catTimeout);
-      
       img.src = CAT_OPEN;
-      
       catTimeout = setTimeout(() => {
         img.src = CAT_CLOSED;
       }, 150);
@@ -550,20 +535,22 @@
       document.getElementById('cpsDisplay').textContent = clickTimes.length.toFixed(1);
     }
     
-    function syncScore(force) {
+    async function syncScore(force) {
       if (!currentUser || isSyncing) return;
-      if (!force && Date.now() - lastSync < 2000) return;
+      if (!force && Date.now() - lastSync < 2500) return;
       
       isSyncing = true;
       lastSync = Date.now();
       
-      google.script.run
-        .withSuccessHandler(res => {
-          isSyncing = false;
-          if (res && res.score) score = res.score;
-        })
-        .withFailureHandler(() => { isSyncing = false; })
-        .updateScore(currentUser.username, score);
+      const res = await callAPI('updatescore', {
+        username: currentUser.username,
+        score: score
+      });
+      
+      isSyncing = false;
+      if (res.success && res.score) {
+        score = res.score;
+      }
     }
     
     function openLeaderboard() {
@@ -576,15 +563,13 @@
       document.getElementById('lbModal').classList.remove('show');
     }
     
-    function refreshLeaderboard() {
-      google.script.run
-        .withSuccessHandler(data => {
-          renderLeaderboard(data || []);
-        })
-        .withFailureHandler(() => {
-          document.getElementById('lbList').innerHTML = '<div class="loading">Không tải được. Thử lại sau.</div>';
-        })
-        .getLeaderboard();
+    async function refreshLeaderboard() {
+      const res = await callAPI('getleaderboard');
+      if (res.success) {
+        renderLeaderboard(res.data || []);
+      } else {
+        document.getElementById('lbList').innerHTML = '<div class="loading">Không tải được</div>';
+      }
     }
     
     function refreshLeaderboardSilent() {
